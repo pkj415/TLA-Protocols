@@ -1,0 +1,21 @@
+code {
+  padding: 0;
+  font-size: 90%;
+  color: black;
+  background-color: white;
+  border: 0px solid white;
+}
+
+a code {
+  color: #08c;
+}
+
+p {
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+li {
+  text-align: justify;
+  text-justify: inter-word;
+}
