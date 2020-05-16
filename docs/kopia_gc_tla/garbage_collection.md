@@ -14,10 +14,6 @@ gc_process_images:
   - image: /assets/images/images.022.png
   - image: /assets/images/images.023.png
   - image: /assets/images/images.024.png
-  - image: /assets/images/images.025.png
-  - image: /assets/images/images.026.png
-  - image: /assets/images/images.027.png
-  - image: /assets/images/images.029.png
 ---
 
 Garbage collection of unused contents (either due to duplicate copies of a content or due to the fact that no snapshot metadata refers to a content) in Kopia is not trivial. This is due two reasons -
