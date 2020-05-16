@@ -1,8 +1,7 @@
 ---
 layout: page
-title: TLA+ for ViewStamped Repilcation
+title: TLA+ for ViewStamped Replication
 ---
-
 
 ViewStamped Replication is a consensus protocol used to realise a replicated state machine [^1].
 

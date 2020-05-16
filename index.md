@@ -1,15 +1,11 @@
 ---
 layout: page
-title: TLA+ for ViewStamped Repilcation, PBFT and Kopia's Garbage collection protocol
+title: TLA+ for ViewStamped Replication, PBFT and Kopia's Garbage collection protocol
 ---
 
-This project page describes my work on checking correctness of distributed protocols and concurrent systems by specifying behaviours in [TLA+](https://lamport.azurewebsites.net/tla/tla.html) and using the TLC model checker. This is done for two well-known distributed protocols for consensus and for a non-quiescent garbage collection process [^1] in a filesystem backup & restore tool (Kopia). Only safety is verified for the two consensus protocols - ViewStamped Replication (VR) and Practical Byzantine Fault Tolerance (PBFT), since it has been proven that liveness cannot be guaranteed by any consensus protocol [^3]. VR remains safe in face of non-byzantine failures (upto n/2 failures in a network of n processes) while PBFT remains safe even in case of byzantine failrues (upto n/3 failures in a network of n processes). The TLA+ spec (short for specification) for VR proves safety of the protocol as specified in the VR paper[^2] (with the exclusion of the reconfiguration protocol). The spec for PBFT is in progress; the section on PBFT's spec describes how safety will be verified. Finally, model checking is used to identify safety violations in the design of Kopia's garbage collection (abbreviated GC) protocol to refine the design and conclude on a safe protocol. Liveness of the protocol is not touched upon as it is trivial to argue to about liveness of the GC protocol.
+This project page describes my work on checking correctness of distributed protocols and concurrent systems by specifying behaviours in [TLA+](https://lamport.azurewebsites.net/tla/tla.html) and using the TLC model checker. This is done for two well-known distributed protocols for consensus and for a non-quiescent garbage collection process [^1] in a filesystem backup & restore tool (Kopia). Only safety is verified for the two consensus protocols - ViewStamped Replication (VR) and Practical Byzantine Fault Tolerance (PBFT), since it has been proven that liveness cannot be guaranteed by any consensus protocol [^4]. VR remains safe in face of non-byzantine failures (upto n/2 failures in a network of n processes) while PBFT remains safe even in case of byzantine failures (upto n/3 failures in a network of n processes). The TLA+ spec (short for specification) for VR proves safety of the protocol as specified in the VR paper[^2] (with the exclusion of the reconfiguration protocol). The spec for PBFT is in progress; the section on PBFT's spec describes how safety will be verified. Finally, model checking is used to identify safety violations in the design of Kopia's garbage collection (abbreviated GC) protocol to refine the design and conclude on a safe protocol. Liveness of the protocol is not touched upon as it is trivial to argue to about liveness of the GC protocol.
 
 A side note - I will try to not be sloppy in terminology as much as possible to avoid ambiguity. Also, most of the terminology is derived from the TLA+.
-
-[^1]: By non-quiesent garbage collection I mean that the garbage collection process runs in the background while other system processes function as usual without any hinderance.
-[^2]: Viewstamped Replication Revisited - [http://pmg.csail.mit.edu/papers/vr-revisited.pdf](http://pmg.csail.mit.edu/papers/vr-revisited.pdf)
-[^3]: The FLP Impossibility rule - [https://groups.csail.mit.edu/tds/papers/Lynch/jacm85.pdf](https://groups.csail.mit.edu/tds/papers/Lynch/jacm85.pdf)
 
 It is difficult to reason about correctness (safety and liveness) of distributed protocols. Before we start off with how to make this process easier for certain protocols, a short brief about certain definitions -
 
@@ -17,19 +13,15 @@ It is difficult to reason about correctness (safety and liveness) of distributed
 2. **State -** A state represents all variables in the world of the protocol (in case of a distributed protocol, it is a combination of all the local states of processes).
 3. **Step -** A step is a transition in the state machine which enables the state machine to move from one state to another when some preconditions hold true. We call a step "enabled" when these preconditions hold on a state.
 4. **Behaviour -** A behaviour of a protocol refers to a particular sequence of states and steps which follow the specified protocol.
-5. **Many to one relationship of behaviours with runs of the protocol -** When a distributed protocol is represented as a state machine, there is a total order on the sequence of actions performed by the different entities in every possbile behaviour. Many behaviours might correspond to a single run[^4] of a distributed protocol in case there are concurrent events in the run (an event corresponds to a step in the behaviour). n concurrent events can be ordered in n! different ways in a behaviour and hence the many to one relationship.
+5. **Many to one relationship of behaviours with runs of the protocol -** When a distributed protocol is represented as a state machine, there is a total order on the sequence of actions performed by the different entities in every possbile behaviour. Many behaviours might correspond to a single run[^5] of a distributed protocol in case there are concurrent events in the run (an event corresponds to a step in the behaviour). n concurrent events can be ordered in n! different ways in a behaviour and hence the many to one relationship.
 
-[^4]: Consistent global states of distributed systems - [https://www.cs.utexas.edu/users/lorenzo/corsi/cs380d/papers/chapt4.pdf](https://www.cs.utexas.edu/users/lorenzo/corsi/cs380d/papers/chapt4.pdf)
+[^1]: By non-quiesent garbage collection I mean that the garbage collection process runs in the background while other system processes function as usual without any hinderance.
+[^2]: Viewstamped Replication Revisited - [http://pmg.csail.mit.edu/papers/vr-revisited.pdf](http://pmg.csail.mit.edu/papers/vr-revisited.pdf)
+[^3]: Practical Byzantine Fault Tolerance - [http://pmg.csail.mit.edu/papers/osdi99.pdf](http://pmg.csail.mit.edu/papers/osdi99.pdf)
+[^4]: The FLP Impossibility rule - [https://groups.csail.mit.edu/tds/papers/Lynch/jacm85.pdf](https://groups.csail.mit.edu/tds/papers/Lynch/jacm85.pdf)
+[^5]: Consistent global states of distributed systems - [https://www.cs.utexas.edu/users/lorenzo/corsi/cs380d/papers/chapt4.pdf](https://www.cs.utexas.edu/users/lorenzo/corsi/cs380d/papers/chapt4.pdf)
 
 For arguing about safety, we will consider all possible behaviours in the system and hence all possible runs. Distributed protocols are hard to reason about because at each state, multiple steps might be enabled and the system might transition into any one of the possible next states based on these steps. And multiple steps being enabled at a step represent the possibilty that the system might go into any state in reality and we would have to reason about correctness on all possible next states and sequence of steps post them to reason about the protocol as a whole.
-
-In all diagrams, I will use -
-
-1. Blue boxes to represent state
-2. Orange arrows to represent possible steps (i.e., enabled steps)
-3. Green arrows to represent the step taken
-
-The figure represents a simple state machine that models just a producer consumer queue (nothing else, not even the state of producers/ consumers). The queue is represented as an ordered tuple (has the syntax << >> in TLA+). At each state the enabled steps and the actual step taken is/are shown. The system has just two steps - produce and consume.
 
 Also, I will show only the states and steps relevant to any discussion. You can assume there might be many more possible next steps at states that are shown and any possible step to be taken in case I don't show a green arrow (which means the next step isn't relevant to the discussion). I will point out places with exceptions to this rule, if required.
 
@@ -46,5 +38,5 @@ Getting back to our goal of making the process of reasoning about correctness ea
 The following sections describe in detail, the use of TLA+ and TLC for the two distributed protocol and the garbage collection protocol -
 
 - [Viewstamped Replication](pages/vr_tla.html)
-- [Practical Byzantine Fault Tolerance](pages/pbft_tla.html)
 - [Garbage collection in Kopia](pages/kopia_gc_tla.html)
+- [Practical Byzantine Fault Tolerance](pages/pbft_tla.html)
