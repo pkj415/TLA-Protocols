@@ -13,4 +13,4 @@ Kopia stores its data in a data structure called *Repository* which resides on r
 
 Tieing it all up, a repository contains index blobs and data blobs. The data blobs contain contents which are referenced by entries in the index blobs. Keep in mind that in all figures, the content id (such as C4) is some hash of the content data that is written in the content. The content id provides content-addresability i.e., any snapshot process can reuse the content already written earlier (perhaps by another snapshot process) by searching the repository for the content data to be written using the hash of the content data. All index entries for a data blob will be found in the same index blob. Below is a sample depiction of three data blobs and 2 index blobs in a repository.
 
-![](/assets/images/images.001.png "Organization of contents, index blobs and data blobs")
+![]({{ site.baseurl }}/assets/images/images.001.png "Organization of contents, index blobs and data blobs")

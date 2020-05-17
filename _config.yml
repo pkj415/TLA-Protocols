@@ -34,7 +34,7 @@ search_tokenizer_separator: /[\s/]+/
 heading_anchors: true
 
 # Footer content appears at the bottom of every page's main content
-footer_content: "Work done by Piyush Kumar Jain at University of Texas at Austin in collaboration with Jarek Lopez and under the supervision of Prof. Vijay Chidambaram"
+footer_content: "Work done by Piyush Kumar Jain at University of Texas at Austin in collaboration with Julio Lopez and under the supervision of Prof. Vijay Chidambaram"
 
 # Color scheme currently only supports "dark" or nil (default)
 color_scheme: nil
