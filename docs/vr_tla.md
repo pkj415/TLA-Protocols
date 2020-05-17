@@ -51,4 +51,6 @@ To restrict the behaviours on which the model checker runs, a set of constraints
     \* scans through).
     MaxFailures
 
-Below is the TLC model checking result for the case of 3 processes with MaxViewNum as 1 and two client commands.
+Below is the TLC model checking result for the case of 3 processes with MaxViewNum as 1 and two client commands without any node failures (the state space is huge with failures and I didn't have AWS or anyother credits to run it on the cloud).
+
+![](/assets/images/vr_test.png "TLC model checker for VR")
